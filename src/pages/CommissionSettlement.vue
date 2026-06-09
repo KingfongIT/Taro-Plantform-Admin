@@ -115,7 +115,7 @@ const dialog = useDialogStore()
 const step = ref(1)
 
 const rawData = ref([])
-const itemsPerPage = ref(-1)
+const itemsPerPage = ref(50)
 const loaded = ref(false)
 const headers = ref([
   { title: '姓名', key: 'name' },

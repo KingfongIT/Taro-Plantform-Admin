@@ -64,6 +64,16 @@ const vuetify = createVuetify({
     VDateInput,
   },
   directives,
+  defaults: {
+    VDataTable: {
+      itemsPerPage: 50,
+      itemsPerPageOptions: [50, 100, { value: -1, title: 'ALL' }],
+    },
+    VDataTableServer: {
+      itemsPerPage: 50,
+      itemsPerPageOptions: [50, 100, { value: -1, title: 'ALL' }],
+    },
+  },
 })
 
 export default vuetify

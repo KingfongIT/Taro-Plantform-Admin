@@ -11,6 +11,7 @@ export const useDialogStore = defineStore('dialog', {
     errorVisible: false,
     errorTitle: '',
     errorMessage: '',
+    isSuccess: false,
 
     // confirm
     isDelete: false,
@@ -29,15 +30,23 @@ export const useDialogStore = defineStore('dialog', {
       this.loading = false
     },
 
-    // Error
+    // Error & Success Dialog
     showError(title, message) {
       this.errorTitle = title
       this.errorMessage = message
+      this.isSuccess = false
+      this.errorVisible = true
+    },
+    showSuccess(title, message) {
+      this.errorTitle = title
+      this.errorMessage = message
+      this.isSuccess = true
       this.errorVisible = true
     },
     closeError() {
       this.errorTitle = ''
       this.errorMessage = ''
+      this.isSuccess = false
       this.errorVisible = false
     },
     showAxiosError(err, defaultTitle = '操作失敗') {

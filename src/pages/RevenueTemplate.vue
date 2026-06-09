@@ -34,18 +34,15 @@
         :items="serverItems"
         :loading="loading"
         :search="search"
+        @click:row="(_, { item }) => onRowClick(item)"
         hover
+        style="cursor: pointer"
       >
         <template #item.schemeName="{ item }">
-          <v-btn
-            variant="text"
-            color="primary"
-            :to="{ name: 'RevenueTemplateHistory', params: { id: item.id } }"
-            >{{ item.schemeName }}</v-btn
-          >
+          <span class="text-primary font-weight-medium">{{ item.schemeName }}</span>
         </template>
         <template #item.actions="{ item }">
-          <v-btn variant="text" color="error" icon="delete" @click="deleteData(item.id)"></v-btn>
+          <v-btn variant="text" color="error" icon="delete" @click.stop="deleteData(item.id)"></v-btn>
         </template>
         <template #no-data>
           <div class="text-center pa-6">
@@ -56,16 +53,17 @@
       </v-data-table>
     </v-card>
   </v-container>
-  <v-navigation-drawer v-model="openAdd" location="right" temporary :width="680">
-    <v-toolbar color="white">
-      <v-toolbar-title class="font-weight-medium">規格內容</v-toolbar-title>
-      <v-spacer />
-      <v-btn icon variant="text" @click="closeDialog()">
-        <v-icon>close</v-icon>
-      </v-btn>
-    </v-toolbar>
-    <v-form ref="form" v-model="isValid" @submit.prevent="addTemplate">
-      <v-container style="background-color: #f5f5f5; min-height: 100vh">
+  <v-navigation-drawer v-model="openAdd" location="right" temporary :width="680" class="scrollable-body-drawer">
+    <div class="d-flex flex-column h-100">
+      <v-toolbar color="white" class="flex-grow-0 flex-shrink-0">
+        <v-toolbar-title class="font-weight-medium">規格內容</v-toolbar-title>
+        <v-spacer />
+        <v-btn icon variant="text" @click="closeDialog()">
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-form ref="form" v-model="isValid" @submit.prevent="addTemplate" class="d-flex flex-column flex-grow-1 overflow-hidden">
+        <v-container style="background-color: #f5f5f5;" class="flex-grow-1 overflow-y-auto">
         <v-card flat class="mb-3">
           <v-card-title>模板設定</v-card-title>
           <v-card-text>
@@ -282,12 +280,13 @@
             </div>
           </v-card-text>
         </v-card>
-      </v-container>
-      <v-toolbar color="white" class="d-flex justify-space-between">
-        <v-btn variant="text" class="mr-2" @click="closeDialog()">取消</v-btn>
-        <v-btn variant="flat" color="primary" type="submit">新增</v-btn>
-      </v-toolbar>
-    </v-form>
+        </v-container>
+        <v-toolbar color="white" class="flex-grow-0 flex-shrink-0 d-flex justify-space-between px-4 border-t">
+          <v-btn variant="text" class="mr-2" @click="closeDialog()">取消</v-btn>
+          <v-btn variant="flat" color="primary" type="submit">新增</v-btn>
+        </v-toolbar>
+      </v-form>
+    </div>
   </v-navigation-drawer>
 </template>
 
@@ -297,9 +296,11 @@ import { useProductRules } from '@/utils/rules'
 import { useDialogStore } from '@/stores/dialog'
 import { onMounted, ref } from 'vue'
 import { useDateFormat } from '@/utils/formatDate'
+import { useRouter } from 'vue-router'
 
 const dialog = useDialogStore()
 const rules = useProductRules()
+const router = useRouter()
 
 const isValid = ref(false)
 const form = ref(null)
@@ -308,6 +309,10 @@ const openAdd = ref(false)
 const serverItems = ref([])
 const loading = ref(false)
 const search = ref('')
+
+function onRowClick(item) {
+  router.push({ name: 'RevenueTemplateHistory', params: { id: item.id } })
+}
 
 const headers = [
   { title: '名稱', key: 'schemeName' },
@@ -416,3 +421,9 @@ onMounted(async () => {
   await fetchData()
 })
 </script>
+
+<style scoped>
+.scrollable-body-drawer :deep(.v-navigation-drawer__content) {
+  overflow-y: hidden !important;
+}
+</style>

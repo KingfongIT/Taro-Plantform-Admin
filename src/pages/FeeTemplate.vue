@@ -44,7 +44,7 @@
       </div>
     </v-container>
   </div>
-  <v-navigation-drawer v-model="addDialog" location="right" temporary :width="850">
+  <v-navigation-drawer v-model="addDialog" location="right" temporary :width="850" class="scrollable-body-drawer">
     <div class="d-flex flex-column h-100">
       <!-- Header -->
       <div class="pa-4 d-flex align-center justify-space-between">
@@ -670,5 +670,9 @@ async function toggleIsActive(item, nextVal) {
   top: 0;
   z-index: 1000;
   background: white;
+}
+
+.scrollable-body-drawer :deep(.v-navigation-drawer__content) {
+  overflow-y: hidden !important;
 }
 </style>

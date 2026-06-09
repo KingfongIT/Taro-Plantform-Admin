@@ -24,13 +24,8 @@
             <template #subtitle>
               <div class="mb-1">下載報表並執行行政發佣作業</div>
             </template>
-            <v-btn
-              prepend-icon="download"
-              color="primary"
-              variant="outlined"
-              @click="exportTempSummary"
-              >500以上雞肉飼料佣金總表</v-btn
-            >
+            <v-btn prepend-icon="download" color="primary" variant="outlined"
+              @click="exportTempSummary">500以上雞肉飼料佣金總表</v-btn>
           </v-stepper-item>
 
           <v-divider></v-divider>
@@ -54,7 +49,12 @@
             <template #subtitle>
               <div class="mb-1">確認佣金發放完成後，進行小芋頭雞肉飼料更新</div>
             </template>
-            <v-btn color="primary" variant="flat" @click="updateToken">更新小芋頭雞肉飼料</v-btn>
+            <div class="d-flex flex-column align-start mt-0">
+              <v-checkbox v-model="isManual" label="手動發放 (不使用玉山 API)" hide-details density="compact" color="primary"
+                class="ma-0 pa-0 compact-checkbox"></v-checkbox>
+              <v-btn variant="flat" color="primary" :loading="loading" @click="updateToken"
+                class="mt-1">更新小芋頭雞肉飼料</v-btn>
+            </div>
           </v-stepper-item>
 
           <v-divider></v-divider>
@@ -66,12 +66,8 @@
             <template #subtitle>
               <div class="mb-1">下載歷史資料</div>
             </template>
-            <v-btn color="primary" variant="outlined" @click="open500upDialog" class="mr-2"
-              >總表</v-btn
-            >
-            <v-btn color="primary" variant="outlined" @click="openIndividualDialog"
-              >個人佣金表</v-btn
-            >
+            <v-btn color="primary" variant="outlined" @click="open500upDialog" class="mr-2">總表</v-btn>
+            <v-btn color="primary" variant="outlined" @click="openIndividualDialog">個人佣金表</v-btn>
           </v-stepper-item>
         </v-stepper-header>
       </v-stepper>
@@ -84,11 +80,7 @@
             <div class="d-flex align-center ga-3">
               <p>佣金發放</p>
               <v-spacer></v-spacer>
-              <v-text-field
-                v-model.lazy.trim="search"
-                placeholder="搜尋姓名、身分證、信箱"
-                hide-details
-              ></v-text-field>
+              <v-text-field v-model.lazy.trim="search" placeholder="搜尋姓名、身分證、信箱" hide-details></v-text-field>
               <v-btn variant="flat" color="error" @click="testDelete"> 測試刪除用 </v-btn>
             </div>
           </v-card-title>
@@ -123,14 +115,71 @@
         <v-radio-group v-model="mode500up">
           <v-radio label="當月" value="current" />
           <v-radio label="選擇月份" value="custom" />
-          <input
-            v-if="mode500up === 'custom'"
-            ref="monthInput"
-            type="month"
-            v-model="yearMonth500up"
-            :max="maxMonth"
-            class="ma-3 pa-2 border rounded"
-          />
+          <div v-if="mode500up === 'custom'" class="ma-3">
+            <v-menu
+              v-model="monthMenu500up"
+              :close-on-content-click="false"
+              location="bottom start"
+            >
+              <template #activator="{ props }">
+                <v-text-field
+                  v-model="yearMonth500up"
+                  label="選擇月份"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details
+                  readonly
+                  prepend-inner-icon="calendar_today"
+                  color="primary"
+                  v-bind="props"
+                  class="cursor-pointer"
+                  style="cursor: pointer;"
+                ></v-text-field>
+              </template>
+
+              <v-card width="290" class="pa-3" border flat elevation="3">
+                <!-- 年份選擇列 -->
+                <div class="d-flex align-center justify-space-between mb-3">
+                  <v-btn
+                    icon="chevron_left"
+                    variant="text"
+                    density="comfortable"
+                    @click="pickerYear500up--"
+                  ></v-btn>
+                  <span class="text-subtitle-1 font-weight-bold">{{ pickerYear500up }} 年</span>
+                  <v-btn
+                    icon="chevron_right"
+                    variant="text"
+                    density="comfortable"
+                    :disabled="pickerYear500up >= maxYear500up"
+                    @click="pickerYear500up++"
+                  ></v-btn>
+                </div>
+
+                <!-- 3x4 月份格線 -->
+                <v-row class="ma-0" dense>
+                  <v-col
+                    v-for="(mName, idx) in monthNames"
+                    :key="idx"
+                    cols="4"
+                    class="text-center pa-1"
+                  >
+                    <v-btn
+                      variant="tonal"
+                      :color="isSelectedMonth500up(idx) ? 'primary' : 'default'"
+                      :disabled="isMonthDisabled500up(idx)"
+                      block
+                      size="small"
+                      class="text-body-2 font-weight-bold"
+                      @click="selectMonth500up(idx)"
+                    >
+                      {{ mName }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-menu>
+          </div>
         </v-radio-group>
       </v-card-text>
       <v-card-actions>
@@ -147,14 +196,71 @@
         <v-radio-group v-model="modeDividual">
           <v-radio label="當月" value="current" />
           <v-radio label="選擇月份" value="custom" />
-          <input
-            v-if="modeDividual === 'custom'"
-            ref="monthInput"
-            type="month"
-            v-model="yearMonthDividual"
-            :max="maxMonth"
-            class="ma-3 pa-2 border rounded"
-          />
+          <div v-if="modeDividual === 'custom'" class="ma-3">
+            <v-menu
+              v-model="monthMenuDividual"
+              :close-on-content-click="false"
+              location="bottom start"
+            >
+              <template #activator="{ props }">
+                <v-text-field
+                  v-model="yearMonthDividual"
+                  label="選擇月份"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details
+                  readonly
+                  prepend-inner-icon="calendar_today"
+                  color="primary"
+                  v-bind="props"
+                  class="cursor-pointer"
+                  style="cursor: pointer;"
+                ></v-text-field>
+              </template>
+
+              <v-card width="290" class="pa-3" border flat elevation="3">
+                <!-- 年份選擇列 -->
+                <div class="d-flex align-center justify-space-between mb-3">
+                  <v-btn
+                    icon="chevron_left"
+                    variant="text"
+                    density="comfortable"
+                    @click="pickerYearDividual--"
+                  ></v-btn>
+                  <span class="text-subtitle-1 font-weight-bold">{{ pickerYearDividual }} 年</span>
+                  <v-btn
+                    icon="chevron_right"
+                    variant="text"
+                    density="comfortable"
+                    :disabled="pickerYearDividual >= maxYearDividual"
+                    @click="pickerYearDividual++"
+                  ></v-btn>
+                </div>
+
+                <!-- 3x4 月份格線 -->
+                <v-row class="ma-0" dense>
+                  <v-col
+                    v-for="(mName, idx) in monthNames"
+                    :key="idx"
+                    cols="4"
+                    class="text-center pa-1"
+                  >
+                    <v-btn
+                      variant="tonal"
+                      :color="isSelectedMonthDividual(idx) ? 'primary' : 'default'"
+                      :disabled="isMonthDisabledDividual(idx)"
+                      block
+                      size="small"
+                      class="text-body-2 font-weight-bold"
+                      @click="selectMonthDividual(idx)"
+                    >
+                      {{ mName }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-menu>
+          </div>
         </v-radio-group>
       </v-card-text>
       <v-card-actions>
@@ -190,6 +296,7 @@ const token500upRef = ref()
 
 const loading = ref(false)
 const isClosed = ref(false)
+const isManual = ref(false)
 
 /* dialog */
 const token500upDialog = ref(false)
@@ -201,25 +308,103 @@ const yearMonth500up = ref('')
 const modeDividual = ref('current')
 const yearMonthDividual = ref('')
 
+// 自訂月份選擇器狀態
+const monthMenu500up = ref(false)
+const pickerYear500up = ref(new Date().getFullYear())
+
+const monthMenuDividual = ref(false)
+const pickerYearDividual = ref(new Date().getFullYear())
+
+const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+
 const maxMonth = computed(() => {
   const now = new Date()
-
   // 上個月
   const year = now.getFullYear()
-  const month = now.getMonth() + 1 // 這裡不用 +1，因為要上個月
-
+  const month = now.getMonth() + 1
   const lastMonthDate = new Date(year, month, 1)
-
   return lastMonthDate.toISOString().slice(0, 7)
 })
 
+const maxYear500up = computed(() => {
+  if (!maxMonth.value) return new Date().getFullYear()
+  return parseInt(maxMonth.value.split('-')[0])
+})
+const maxMonthNum500up = computed(() => {
+  if (!maxMonth.value) return new Date().getMonth() + 1
+  return parseInt(maxMonth.value.split('-')[1])
+})
+
+function isMonthDisabled500up(idx) {
+  const monthNum = idx + 1
+  if (pickerYear500up.value > maxYear500up.value) return true
+  if (pickerYear500up.value === maxYear500up.value && monthNum > maxMonthNum500up.value) return true
+  return false
+}
+
+function isSelectedMonth500up(idx) {
+  if (!yearMonth500up.value) return false
+  const [y, m] = yearMonth500up.value.split('-')
+  return parseInt(y) === pickerYear500up.value && parseInt(m) === (idx + 1)
+}
+
+function selectMonth500up(idx) {
+  const monthStr = (idx + 1).toString().padStart(2, '0')
+  yearMonth500up.value = `${pickerYear500up.value}-${monthStr}`
+  monthMenu500up.value = false
+}
+
+const maxYearDividual = computed(() => {
+  if (!maxMonth.value) return new Date().getFullYear()
+  return parseInt(maxMonth.value.split('-')[0])
+})
+const maxMonthNumDividual = computed(() => {
+  if (!maxMonth.value) return new Date().getMonth() + 1
+  return parseInt(maxMonth.value.split('-')[1])
+})
+
+function isMonthDisabledDividual(idx) {
+  const monthNum = idx + 1
+  if (pickerYearDividual.value > maxYearDividual.value) return true
+  if (pickerYearDividual.value === maxYearDividual.value && monthNum > maxMonthNumDividual.value) return true
+  return false
+}
+
+function isSelectedMonthDividual(idx) {
+  if (!yearMonthDividual.value) return false
+  const [y, m] = yearMonthDividual.value.split('-')
+  return parseInt(y) === pickerYearDividual.value && parseInt(m) === (idx + 1)
+}
+
+function selectMonthDividual(idx) {
+  const monthStr = (idx + 1).toString().padStart(2, '0')
+  yearMonthDividual.value = `${pickerYearDividual.value}-${monthStr}`
+  monthMenuDividual.value = false
+}
+
 function open500upDialog() {
   token500upDialog.value = true
+  const ym = yearMonth500up.value || getCurrentMonth()
+  pickerYear500up.value = parseInt(ym.split('-')[0])
 }
 
 function openIndividualDialog() {
   individualDialog.value = true
+  const ym = yearMonthDividual.value || getCurrentMonth()
+  pickerYearDividual.value = parseInt(ym.split('-')[0])
 }
+
+watch(yearMonth500up, (val) => {
+  if (val) {
+    pickerYear500up.value = parseInt(val.split('-')[0])
+  }
+})
+
+watch(yearMonthDividual, (val) => {
+  if (val) {
+    pickerYearDividual.value = parseInt(val.split('-')[0])
+  }
+})
 
 async function updateToken() {
   const ok = await dialog.askConfirm({
@@ -237,7 +422,9 @@ async function updateToken() {
 
   try {
     loading.value = true
-    const { data } = await api.post(`/Settle`)
+    const { data } = await api.post(`/Settle`, null, {
+      params: { isManual: isManual.value }
+    })
     console.log(data)
     token500upRef.value?.fetchData()
   } catch (error) {
@@ -386,4 +573,13 @@ watch(tab, () => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.compact-checkbox .v-selection-control) {
+  min-height: 28px !important;
+}
+
+:deep(.compact-checkbox .v-label) {
+  height: 28px !important;
+  line-height: 28px !important;
+}
+</style>

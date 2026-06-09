@@ -51,50 +51,36 @@
         :loading="loading"
         :search="search"
         hover
+        @click:row="(_, { item }) => onRowClick(item)"
+        style="cursor: pointer"
       >
         <template #item.actions="{ item }">
-          <v-menu location="bottom end" offset="8">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                size="small"
-                variant="text"
-                icon
-                @click.stop
-                aria-label="更多操作"
-              >
-                <v-icon>more_horiz</v-icon>
-              </v-btn>
-            </template>
-            <v-list density="compact" v-if="isOffice">
-              <v-list-item @click.stop="editCourse(item.product.id)">
-                <template #prepend><v-icon>edit</v-icon></template>
-                <v-list-item-title>編輯</v-list-item-title>
-              </v-list-item>
-            </v-list>
-            <v-list density="compact" v-else>
-              <v-list-item @click.stop="edit(item.product.id)">
-                <template #prepend><v-icon>edit</v-icon></template>
-                <v-list-item-title>編輯</v-list-item-title>
-              </v-list-item>
-
-              <v-list-item @click.stop="archive(item.product.id)">
-                <template #prepend
-                  ><v-icon>{{ isValid ? 'archive' : 'unarchive' }}</v-icon></template
+          <div class="d-flex justify-end" @click.stop>
+            <v-menu location="bottom end" offset="8" v-if="!isOffice">
+              <template #activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  size="small"
+                  variant="text"
+                  icon
+                  aria-label="更多操作"
                 >
-                <v-list-item-title>{{ isValid ? '封存' : '還原' }}</v-list-item-title>
-              </v-list-item>
-              <!-- <v-list-item v-else @click.stop="restore(item)">
-                <template #prepend><v-icon>unarchive</v-icon></template>
-                <v-list-item-title>還原</v-list-item-title>
-              </v-list-item> -->
+                  <v-icon>more_horiz</v-icon>
+                </v-btn>
+              </template>
+              <v-list density="compact">
+                <v-list-item @click="archive(item.product.id)">
+                  <template #prepend><v-icon>{{ isValid ? 'archive' : 'unarchive' }}</v-icon></template>
+                  <v-list-item-title>{{ isValid ? '封存' : '還原' }}</v-list-item-title>
+                </v-list-item>
 
-              <v-list-item @click.stop="confirmDelete(item.product.id)">
-                <template #prepend><v-icon color="error">delete</v-icon></template>
-                <v-list-item-title class="text-error">刪除</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+                <v-list-item @click="confirmDelete(item.product.id)">
+                  <template #prepend><v-icon color="error">delete</v-icon></template>
+                  <v-list-item-title class="text-error">刪除</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
         </template>
 
         <template #no-data>
@@ -102,9 +88,6 @@
             <img src="/images/NoSearch.svg" />
             <h6 class="mt-2">搜尋無結果</h6>
           </div>
-        </template>
-        <template #item.detail="{ item }">
-          <v-btn color="primary" variant="flat" @click="goToDetail(item.accountGuid)">詳情</v-btn>
         </template>
       </v-data-table>
     </v-card>
@@ -144,7 +127,7 @@ const headers = [
     key: 'product.updatedAt',
     value: (item) => formatDate(item.product.updatedAt),
   },
-  { title: '操作', key: 'actions', sortable: false, align: 'end' },
+  ...(!isOffice ? [{ title: '', key: 'actions', sortable: false, align: 'end', width: '60' }] : []),
 ]
 
 /* ---------- 資料讀取 ---------- */
@@ -181,12 +164,12 @@ function onTabChange() {
 }
 
 /* ---------- 動作 ---------- */
-function edit(id) {
-  router.push({ name: 'ProductEdit', params: { id } })
-}
-
-function editCourse(id) {
-  router.push({ name: 'CourseDetail', params: { id } })
+function onRowClick(item) {
+  if (isOffice) {
+    router.push({ name: 'CourseDetail', params: { id: item.product.id } })
+  } else {
+    router.push({ name: 'ProductEdit', params: { id: item.product.id } })
+  }
 }
 
 async function archive(id) {

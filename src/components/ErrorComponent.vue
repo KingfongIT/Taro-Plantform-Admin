@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog.errorVisible" width="400">
     <v-card>
-      <v-card-title class="text-h6 text-error">{{ dialog.errorTitle }}</v-card-title>
+      <v-card-title :class="['text-h6', dialog.isSuccess ? 'text-success' : 'text-error']">{{ dialog.errorTitle }}</v-card-title>
       <v-card-text class="text-center">{{ dialog.errorMessage }}</v-card-text>
       <v-card-actions>
         <v-spacer />

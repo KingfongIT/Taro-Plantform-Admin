@@ -6,6 +6,27 @@ body {
   font-family: var(--v-font-family);
 }
 
+.test-env-watermark {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.test-env-watermark span {
+  color: rgba(220, 0, 0, 0.05);
+  font-size: clamp(120px, 18vw, 320px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.5em;
+  white-space: nowrap;
+  transform: rotate(-28deg);
+  user-select: none;
+}
+
 .v-card {
   border-radius: 8px;
 }

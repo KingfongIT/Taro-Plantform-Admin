@@ -71,23 +71,14 @@
         :search="search"
         item-value="name"
         @update:options="loadItems"
+        @click:row="(_, { item }) => goToDetail(item.salesOrderId)"
         hover
+        style="cursor: pointer"
       >
         <template #item.orderStatus="{ item }">
           <v-chip v-bind="formatOrderStatus(item.orderStatus)">
             {{ formatOrderStatus(item.orderStatus).text }}
           </v-chip>
-        </template>
-        <template #item.buyerName="{ item }">
-          <!-- @click="goToMemberDetail(item.accountGuid)" -->
-          <v-btn color="primary" variant="text" @click="goToMemberDetail(item.accountGuid)">{{
-            item.buyerName
-          }}</v-btn>
-        </template>
-        <template #item.orderNo="{ item }">
-          <v-btn color="primary" variant="text" @click="goToDetail(item.salesOrderId)">{{
-            item.orderNo
-          }}</v-btn>
         </template>
         <template #item.paymentStatus="{ item }">
           <v-chip
@@ -98,12 +89,14 @@
           </v-chip>
         </template>
         <template #item.isEndCase="{ item }">
-          <v-checkbox
-            color="primary"
-            v-model="item.isEndCase"
-            hide-details
-            @update:modelValue="onToggleEndCase(item.salesOrderId, item.isEndCase)"
-          ></v-checkbox>
+          <div @click.stop>
+            <v-checkbox
+              color="primary"
+              v-model="item.isEndCase"
+              hide-details
+              @update:modelValue="onToggleEndCase(item.salesOrderId, item.isEndCase)"
+            ></v-checkbox>
+          </div>
         </template>
         <template #no-data>
           <div class="text-center pa-6">
@@ -257,7 +250,7 @@ async function fetchData({ page, itemsPerPage, sortBy, search }) {
   }
 }
 
-const itemsPerPage = ref(100)
+const itemsPerPage = ref(50)
 const search = ref('')
 const serverItems = ref([])
 const loading = ref(false)
@@ -265,7 +258,7 @@ const totalItems = ref(0)
 
 const options = ref({
   page: 1,
-  itemsPerPage: 100,
+  itemsPerPage: 50,
   sortBy: [],
   search: '',
 })

@@ -91,16 +91,17 @@
       </v-container>
     </div>
   </div>
-  <v-navigation-drawer v-model="openEdit" location="right" temporary :width="680" persistent>
-    <v-toolbar color="white">
-      <v-toolbar-title class="font-weight-medium">規格內容</v-toolbar-title>
-      <v-spacer />
-      <!-- <v-btn icon variant="text" @click="openEdit = false">
-        <v-icon>close</v-icon>
-      </v-btn> -->
-    </v-toolbar>
-    <v-form ref="form" v-model="isValid" @submit.prevent="edit(props.id)">
-      <v-container style="background-color: #f5f5f5; min-height: 100vh">
+  <v-navigation-drawer v-model="openEdit" location="right" temporary :width="680" persistent class="scrollable-body-drawer">
+    <div class="d-flex flex-column h-100">
+      <v-toolbar color="white" class="flex-grow-0 flex-shrink-0">
+        <v-toolbar-title class="font-weight-medium">規格內容</v-toolbar-title>
+        <v-spacer />
+        <!-- <v-btn icon variant="text" @click="openEdit = false">
+          <v-icon>close</v-icon>
+        </v-btn> -->
+      </v-toolbar>
+      <v-form ref="form" v-model="isValid" @submit.prevent="edit(props.id)" class="d-flex flex-column flex-grow-1 overflow-hidden">
+        <v-container style="background-color: #f5f5f5;" class="flex-grow-1 overflow-y-auto">
         <v-card flat class="mb-3">
           <v-card-title>模板設定</v-card-title>
           <v-card-text>
@@ -317,12 +318,13 @@
             </div>
           </v-card-text>
         </v-card>
-      </v-container>
-      <v-toolbar color="white" class="d-flex justify-space-between">
-        <v-btn variant="text" class="mr-2 flex-grow-1" @click="openEdit = false">取消</v-btn>
-        <v-btn color="primary" variant="flat" class="flex-grow-1" type="submit">儲存</v-btn>
-      </v-toolbar>
-    </v-form>
+        </v-container>
+        <v-toolbar color="white" class="flex-grow-0 flex-shrink-0 d-flex justify-space-between px-4 border-t">
+          <v-btn variant="text" class="mr-2 flex-grow-1" @click="openEdit = false">取消</v-btn>
+          <v-btn color="primary" variant="flat" class="flex-grow-1" type="submit">儲存</v-btn>
+        </v-toolbar>
+      </v-form>
+    </div>
   </v-navigation-drawer>
 </template>
 
@@ -456,5 +458,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+.scrollable-body-drawer :deep(.v-navigation-drawer__content) {
+  overflow-y: hidden !important;
 }
 </style>

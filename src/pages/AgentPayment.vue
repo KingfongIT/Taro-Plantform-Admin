@@ -28,13 +28,10 @@
         :loading="loading"
         item-value="transactionId"
         @update:options="loadItems"
+        @click:row="(_, { item }) => goToAgentDetail(item.guid)"
         hover
+        style="cursor: pointer"
       >
-        <template #item.name="{ item }">
-          <v-btn color="primary" variant="text" @click="goToAgentDetail(item.guid)">{{
-            item.name
-          }}</v-btn>
-        </template>
         <template #item.payStatus="{ item }">
           <v-chip v-bind="formatPaymentStatus(item.payStatus)">{{
             formatPaymentStatus(item.payStatus).text
@@ -67,7 +64,7 @@ const headers = [
 
 const serverItems = ref([])
 const totalItems = ref(0)
-const itemsPerPage = ref(25)
+const itemsPerPage = ref(50)
 const search = ref('')
 const loading = ref(false)
 

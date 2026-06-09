@@ -56,6 +56,7 @@ import { useReviewStore } from '@/stores/review'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
+
 const isDev = import.meta.env.DEV
 const router = useRouter()
 const auth = useAuthStore()
@@ -274,6 +275,21 @@ const navbar = ref([
       //   path: { name: 'Report' },
       // },
       {
+        title: '每月整合結算作業',
+        value: 'MonthlySettleClose',
+        path: { name: 'MonthlySettleClose' },
+      },
+      {
+        title: '所得稅與二代健保設定',
+        value: 'TaxSystemSettings',
+        path: { name: 'TaxSystemSettings' },
+      },
+      {
+        title: '管理費人員設定',
+        value: 'ManagementFeeSettings',
+        path: { name: 'ManagementFeeSettings' },
+      },
+      {
         title: '案件結算作業',
         value: 'CommissionSettlement',
         path: { name: 'CommissionSettlement' },
@@ -433,6 +449,8 @@ onMounted(async () => {
     font-size: 20px;
     margin-left: 5px;
   }
+
+
 
   .v-list-item:hover {
     color: rgb(var(--v-theme-primary));

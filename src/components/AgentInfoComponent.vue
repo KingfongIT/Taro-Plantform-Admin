@@ -456,7 +456,7 @@ function onOptionsUpdate(val) {
 // 分頁 + 排序狀態
 const options = ref({
   page: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 50,
   sortBy: [],
   search: '',
 })

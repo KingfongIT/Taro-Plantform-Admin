@@ -41,7 +41,9 @@
             :search="search"
             item-key="id"
             class="elevation-0"
+            @click:row="(_, { item }) => onRowClick(item.id)"
             hover
+            style="cursor: pointer"
             ><template #item.actions="{ item }">
               <v-menu location="bottom end" offset="8">
                 <template #activator="{ props }">
@@ -92,6 +94,10 @@ const dialog = useDialogStore()
 const router = useRouter()
 // 表格與搜尋
 const serverItems = ref([])
+
+function onRowClick(id) {
+  router.push({ name: 'RoleEdit', params: { id } })
+}
 const search = ref('')
 const loading = ref(false)
 

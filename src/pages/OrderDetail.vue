@@ -1,69 +1,112 @@
 <template>
-  <v-container class="pt-6 pl-6">
-    <div class="d-flex align-center">
-      <div class="d-flex">
-        <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'Order' }">返回</v-btn>
-        <h2 class="text-primary">訂單案件</h2>
-      </div>
-      <v-spacer></v-spacer>
-      <div class="d-flex align-center">
-        <v-btn
-          v-if="
-            authStore.hasPermission('ORDER_CASE_EDIT') &&
-            !['CANCELLED', 'COMPLETED'].includes(order.orderStatus)
-          "
-          class="mr-3"
-          variant="flat"
-          color="primary"
-          hide-details
-          @click="reviewOrder"
-        >
-          審核
-        </v-btn>
-        <v-btn
-          v-if="
-            authStore.hasPermission('ORDER_CASE_EDIT') &&
-            !['CANCELLED', 'COMPLETED'].includes(order.orderStatus)
-          "
-          class="mr-3"
-          prepend-icon="close"
-          variant="flat"
-          color="secondary"
-          @click="cancelOrder(props.id)"
-          >取消訂單</v-btn
-        >
-        <!-- <v-btn
-        v-if="authStore.hasPermission('ORDER_CASE_EDIT')"
-        class="mr-3"
-        prepend-icon="delete"
-        variant="flat"
-        color="secondary"
-        >封存訂單</v-btn
-      > -->
-        <v-checkbox
-          v-if="authStore.hasPermission('ORDER_CASE_EDIT')"
-          v-model="order.isEndCase"
-          @update:model-value="onToggleEndCase"
-          class="mr-3"
-          label="結案"
-          hide-details
-        ></v-checkbox>
-      </div>
+  <div>
+    <div class="order-detail-header">
+      <v-container class="py-3 pl-6">
+        <div class="d-flex align-center">
+          <div class="d-flex">
+            <v-btn class="mr-3" variant="flat" color="secondary" :to="{ name: 'Order' }">返回</v-btn>
+            <h2 class="text-primary">訂單案件</h2>
+          </div>
+          <v-spacer></v-spacer>
+          <div class="d-flex align-center">
+            <v-btn
+              v-if="
+                authStore.hasPermission('ORDER_CASE_EDIT') &&
+                !['CANCELLED', 'COMPLETED'].includes(order.orderStatus)
+              "
+              class="mr-3"
+              variant="flat"
+              color="primary"
+              hide-details
+              @click="reviewOrder"
+            >
+              審核
+            </v-btn>
+            <v-btn
+              v-if="
+                authStore.hasPermission('ORDER_CASE_EDIT') &&
+                !['CANCELLED', 'COMPLETED'].includes(order.orderStatus)
+              "
+              class="mr-3"
+              prepend-icon="close"
+              variant="flat"
+              color="secondary"
+              @click="cancelOrder(props.id)"
+              >取消訂單</v-btn
+            >
+            <v-btn
+              v-if="
+                authStore.hasPermission('ORDER_CASE_EDIT') &&
+                order.paymentStatus === 'PAID' &&
+                order.paymentMethodId === 1
+              "
+              class="mr-3"
+              prepend-icon="currency_exchange"
+              variant="flat"
+              color="error"
+              @click="refundOrder(props.id)"
+              >退款/取消授權</v-btn
+            >
+            <!-- <v-btn
+            v-if="authStore.hasPermission('ORDER_CASE_EDIT')"
+            class="mr-3"
+            prepend-icon="delete"
+            variant="flat"
+            color="secondary"
+            >封存訂單</v-btn
+          > -->
+            <v-checkbox
+              v-if="authStore.hasPermission('ORDER_CASE_EDIT')"
+              v-model="order.isEndCase"
+              @update:model-value="onToggleEndCase"
+              class="mr-3"
+              label="結案"
+              hide-details
+            ></v-checkbox>
+          </div>
+        </div>
+      </v-container>
     </div>
-  </v-container>
-  <v-container class="main pa-10">
-    <v-row>
+    <div class="order-detail-body">
+      <v-container class="main pa-10">
+      <v-row>
       <!-- 左邊 -->
       <v-col cols="8">
-        <div class="mb-3 d-flex align-center justify-space-between">
-          <div class="d-flex align-center">
-            <p class="mr-2">訂單編號：{{ order?.orderNo ?? '00000000000' }}</p>
+        <div class="mb-3 d-flex align-center justify-space-between flex-wrap ga-2">
+          <div class="d-flex align-center flex-wrap ga-2">
+            <p class="mr-2 mb-0">訂單編號：{{ order?.orderNo ?? '00000000000' }}</p>
             <v-chip
-              class="mr-3"
               variant="tonal"
               :color="formatPaymentStatusColor(order?.orderStatus)"
             >
               {{ formatPaymentStatusText(order?.orderStatus) }}
+            </v-chip>
+            <v-chip variant="flat" color="secondary" size="small">
+              金流類型：{{ order?.paymentMethodName || '載入中...' }}
+            </v-chip>
+            <v-chip
+              v-if="order?.paymentStatus === 'PAID'"
+              variant="flat"
+              :color="order?.paymentMethodId === 1 ? 'success' : 'warning'"
+              size="small"
+            >
+              {{ order?.paymentMethodId === 1 ? '可線上退款' : '不支援線上退款 (' + getNonRefundableReason(order?.paymentMethodId) + ')' }}
+            </v-chip>
+            <v-chip
+              v-else-if="order?.paymentStatus === 'REFUNDED'"
+              variant="flat"
+              color="info"
+              size="small"
+            >
+              已退款
+            </v-chip>
+            <v-chip
+              v-else
+              variant="flat"
+              color="grey"
+              size="small"
+            >
+              未付款 (無法退款)
             </v-chip>
           </div>
 
@@ -438,7 +481,7 @@
               <tbody>
                 <tr v-for="payment in productOrderPayment" :key="payment.productOrderPaymentId">
                   <td>{{ useDateFormat(payment?.createdAt, 'YYYY/MM/DD HH:mm') }}</td>
-                  <td>信用卡</td>
+                  <td>{{ payment?.paymentMethodName || '信用卡' }}</td>
                   <td>{{ payment?.amount }}元</td>
                   <td>
                     <v-chip size="small" :color="formatPaymentStatusColor(payment?.status)">{{
@@ -677,6 +720,8 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  </div><!-- order-detail-body -->
+</div>
 </template>
 <script setup>
 import api from '@/plugins/api'
@@ -749,6 +794,15 @@ function formatPaymentStatusColor(status) {
     COMPLETED: 'success',
   }
   return map[status] || status || '-'
+}
+
+function getNonRefundableReason(methodId) {
+  const map = {
+    2: '轉帳/匯款，請手動線下處理',
+    3: '定期定額訂閱制，不支援單次退款 API',
+    4: '詢價/報價，無付款紀錄',
+  }
+  return map[methodId] || '不支援線上退款'
 }
 
 /* 結案切換 */
@@ -1262,6 +1316,28 @@ async function cancelOrder(id) {
   }
 }
 
+/* 退款/取消授權 */
+async function refundOrder(id) {
+  const ok = await dialog.askConfirm({
+    title: '確認退款/取消授權',
+    message: '將透過藍新金流進行取消授權或退款作業，此操作無法復原。',
+    isDelete: true,
+  })
+
+  if (!ok) return
+
+  dialog.showLoading()
+  try {
+    const { data } = await api.post(`/Order/Refund/${id}`)
+    dialog.showSuccess('退款成功', data.message || '已成功取消授權/退款')
+    await fetchOrder(props.id)
+  } catch (error) {
+    dialog.showAxiosError(error, '退款失敗')
+  } finally {
+    dialog.hideLoading()
+  }
+}
+
 /* 更新合約編號 */
 async function saveContractNumber() {
   const number = order.value?.contractNumber ?? ''
@@ -1340,6 +1416,15 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.order-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
 .main {
   min-height: 100vh;
   background: rgb(var(--v-theme-secondary));
@@ -1348,7 +1433,7 @@ onMounted(async () => {
 .upline-item {
   display: flex;
   flex-direction: column;
-  align-items: center; /* ⭐ 關鍵：水平置中 */
+  align-items: center;
 }
 
 .upline-container {

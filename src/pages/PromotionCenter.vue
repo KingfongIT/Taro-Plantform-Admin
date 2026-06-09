@@ -335,7 +335,7 @@ const totalCount = ref(0)
 // 📌 分頁 + 排序選項（同步給 BaseTable）
 const options = ref({
   page: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 50,
   sortBy: [],
   search: '',
 })

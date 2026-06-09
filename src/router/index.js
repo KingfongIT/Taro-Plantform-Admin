@@ -35,6 +35,9 @@ import Role from '@/pages/Role.vue'
 import AgentPayment from '@/pages/AgentPayment.vue'
 import TokenSettlement from '@/pages/TokenSettlement.vue'
 import CommissionSettlement from '@/pages/CommissionSettlement.vue'
+import MonthlySettleClose from '@/pages/MonthlySettleClose.vue'
+import TaxSystemSettings from '@/pages/TaxSystemSettings.vue'
+import ManagementFeeSettings from '@/pages/ManagementFeeSettings.vue'
 import { components } from 'vuetify/dist/vuetify.js'
 import ProfitReport from '@/pages/ProfitReport.vue'
 import TokenReport from '@/pages/TokenReport.vue'
@@ -314,6 +317,36 @@ const routes = [
             component: CommissionSettlement,
             meta: {
               title: '案件結算作業',
+              requiresAuth: true,
+              permission: 'PRODUCT_CASESETTLEMENT_VIEW',
+            },
+          },
+          {
+            path: 'monthlySettleClose',
+            name: 'MonthlySettleClose',
+            component: MonthlySettleClose,
+            meta: {
+              title: '每月整合結算作業',
+              requiresAuth: true,
+              permission: 'PRODUCT_CASESETTLEMENT_VIEW',
+            },
+          },
+          {
+            path: 'taxSystemSettings',
+            name: 'TaxSystemSettings',
+            component: TaxSystemSettings,
+            meta: {
+              title: '所得稅與二代健保設定',
+              requiresAuth: true,
+              permission: 'PRODUCT_CASESETTLEMENT_VIEW',
+            },
+          },
+          {
+            path: 'managementFeeSettings',
+            name: 'ManagementFeeSettings',
+            component: ManagementFeeSettings,
+            meta: {
+              title: '管理費人員設定',
               requiresAuth: true,
               permission: 'PRODUCT_CASESETTLEMENT_VIEW',
             },

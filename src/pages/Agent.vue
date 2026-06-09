@@ -44,13 +44,10 @@
             :search="search"
             item-value="accountguid"
             @update:options="loadItems"
+            @click:row="(_, { item }) => goToDetail(item.accountGuid)"
             hover
+            style="cursor: pointer"
           >
-            <template #item.name="{ item }">
-              <v-btn variant="text" color="primary" @click="goToDetail(item.accountGuid)">{{
-                item.name
-              }}</v-btn>
-            </template>
             <template #item.status="{ item }">
               <v-chip
                 size="small"
@@ -103,7 +100,7 @@ function getStatusColor(status) {
   return 'warning'
 }
 
-const itemsPerPage = ref(10)
+const itemsPerPage = ref(50)
 const headers = [
   { title: '名稱', key: 'name' },
   { title: '信箱', key: 'email' },
@@ -111,7 +108,6 @@ const headers = [
   // { title: '申請位階', key: 'applyGrade' },
   { title: '付款狀態', key: 'status' },
   { title: '申請日期', key: 'createdDate', value: (item) => formatDate(item.createdDate) },
-  { title: '', key: 'detail', sortable: false },
 ]
 
 //日期樣式

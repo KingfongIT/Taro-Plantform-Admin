@@ -1,9 +1,7 @@
 <template>
-  <v-layout>
-    <v-main>
-      <v-form id="productForm" ref="form" @submit.prevent="onSubmitProduct">
-        <div class="page-wrapper">
-          <v-container class="pb-0">
+  <v-form id="productForm" ref="form" @submit.prevent="onSubmitProduct" class="h-100">
+    <div class="page-wrapper">
+      <v-container class="pb-0 flex-grow-0 flex-shrink-0">
             <div class="main-title d-flex justify-space-between">
               <div class="d-flex align-center justify-space-between">
                 <div class="d-flex align-center">
@@ -49,9 +47,9 @@
             </v-tabs>
           </v-container>
 
-          <v-tabs-window v-model="tab">
+          <v-tabs-window v-model="tab" class="flex-grow-1 overflow-hidden">
             <!-- 商品設定 -->
-            <v-tabs-window-item value="setting" eager ref="sectionSetting">
+            <v-tabs-window-item value="setting" eager ref="sectionSetting" class="h-100 overflow-y-auto">
               <v-container class="main">
                 <h3 class="mb-4">商品設定</h3>
 
@@ -460,11 +458,11 @@
             </v-tabs-window-item>
 
             <!-- 商品規格 -->
-            <v-tabs-window-item value="spectype" eager ref="sectionSpecType">
-              <v-container fluid class="h-screen">
+            <v-tabs-window-item value="spectype" eager ref="sectionSpecType" class="h-100">
+              <v-container fluid class="h-100">
                 <v-row class="h-100">
                   <!-- 左：規格 -->
-                  <v-col cols="4" class="h-100 d-flex flex-column overflow-y-auto">
+                  <v-col cols="4" class="h-100 d-flex flex-column overflow-y-auto overflow-x-hidden">
                     <div class="mb-5 d-flex justify-space-between align-center">
                       <span class="text-h5">商品規格</span>
                       <v-btn
@@ -601,9 +599,9 @@
                       </div>
                     </div>
 
-                    <div class="flex-grow-1 overflow-y-auto">
-                      <v-row>
-                        <v-col v-for="v in variants" :key="v.key" cols="12">
+                    <div class="flex-grow-1 overflow-y-auto overflow-x-hidden">
+                      <v-row class="ma-0">
+                        <v-col v-for="v in variants" :key="v.key" cols="12" class="px-0">
                           <v-card
                             variant="outlined"
                             class="variant-card"
@@ -681,40 +679,45 @@
             </v-tabs-window-item>
           </v-tabs-window>
         </div>
-        <!-- 變體設定 Drawer -->
-        <!-- :key="tempVariant?.key || 'no-variant'" -->
-        <v-navigation-drawer
-          v-model="variantDialog"
-          location="right"
-          temporary
-          :width="680"
-          class="variant-drawer"
-          persistent
-        >
-          <v-toolbar flat>
-            <v-toolbar-title class="font-weight-medium">規格內容</v-toolbar-title>
-            <v-spacer />
-          </v-toolbar>
-          <v-divider />
+      </v-form>
 
-          <v-container v-if="tempVariant" class="pt-4">
-            <div class="d-flex align-center justify-space-between mb-3">
-              <div>
-                <v-chip class="mr-2 mb-2" color="orange-lighten-5" variant="flat">{{
-                  selLabels[0]
-                }}</v-chip>
-                <v-chip class="mb-2" v-if="selLabels[1]" color="green-lighten-5" variant="flat">{{
-                  selLabels[1]
-                }}</v-chip>
-              </div>
-            </div>
+    <!-- 變體設定 Drawer -->
+    <!-- :key="tempVariant?.key || 'no-variant'" -->
+    <v-navigation-drawer
+      v-model="variantDialog"
+      location="right"
+      temporary
+      :width="680"
+      class="variant-drawer scrollable-body-drawer"
+      persistent
+    >
+          <div class="d-flex flex-column h-100">
+            <v-toolbar flat class="flex-grow-0 flex-shrink-0">
+              <v-toolbar-title class="font-weight-medium">規格內容</v-toolbar-title>
+              <v-spacer />
+            </v-toolbar>
+            <v-divider class="flex-grow-0 flex-shrink-0" />
 
             <v-form
+              v-if="tempVariant"
               :key="tempVariant.key"
               ref="variantForm"
               validate-on="input"
-              class="d-flex flex-column ga-4"
+              class="d-flex flex-column flex-grow-1 overflow-hidden"
             >
+              <v-container class="flex-grow-1 overflow-y-auto pt-4">
+                <div class="d-flex align-center justify-space-between mb-3">
+                  <div>
+                    <v-chip class="mr-2 mb-2" color="orange-lighten-5" variant="flat">{{
+                      selLabels[0]
+                    }}</v-chip>
+                    <v-chip class="mb-2" v-if="selLabels[1]" color="green-lighten-5" variant="flat">{{
+                      selLabels[1]
+                    }}</v-chip>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-column ga-4">
               <!-- 基本資訊 -->
               <v-card variant="outlined">
                 <v-card-title class="text-subtitle-1">基本資訊</v-card-title>
@@ -1047,16 +1050,17 @@
                   />
                 </v-card-text>
               </v-card>
-              <div class="d-flex justify-end">
+                </div>
+              </v-container>
+
+              <v-divider class="flex-grow-0 flex-shrink-0" />
+              <div class="d-flex justify-end align-center pa-4 bg-white flex-grow-0 flex-shrink-0">
                 <v-btn variant="text" class="mr-2" @click="variantDialog = false">取消</v-btn>
                 <v-btn color="primary" @click="saveVariant">儲存</v-btn>
               </div>
             </v-form>
-          </v-container>
+          </div>
         </v-navigation-drawer>
-      </v-form>
-    </v-main>
-  </v-layout>
 </template>
 
 <script setup>
@@ -2142,14 +2146,24 @@ async function onSubmitProduct(e) {
 }
 </script>
 
-<style scope>
+<style scoped>
 .page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /*頁面最少全螢幕高度*/
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .error-card {
   border: thin solid red;
+}
+
+:deep(.v-window__container) {
+  height: 100% !important;
+}
+
+.scrollable-body-drawer :deep(.v-navigation-drawer__content) {
+  overflow-y: hidden !important;
 }
 </style>

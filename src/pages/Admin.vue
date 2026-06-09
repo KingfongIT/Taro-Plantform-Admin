@@ -42,7 +42,9 @@
             :search="search"
             item-key="id"
             class="elevation-0"
+            @click:row="(_, { item }) => openEdit(item.id)"
             hover
+            style="cursor: pointer"
           >
             <template #item.roles="{ item }">
               <span v-if="item.roles && item.roles.length">

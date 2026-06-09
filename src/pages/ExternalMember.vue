@@ -32,7 +32,9 @@
             item-key="id"
             :search="searchKeyword"
             @update:options="loadItems()"
+            @click:row="(_, { item }) => goToDetail(item)"
             hover
+            style="cursor: pointer"
           >
             <template #item.updateAt="{ item }">
               {{ formatDate(item.updateAt) }}
@@ -46,37 +48,28 @@
               </v-chip>
             </template>
             <template #item.actions="{ item }">
-              <v-menu location="bottom end" offset="8">
-                <template #activator="{ props }">
-                  <v-btn
-                    v-bind="props"
-                    size="small"
-                    variant="text"
-                    icon
-                    @click.stop
-                    aria-label="更多操作"
-                  >
-                    <v-icon>more_horiz</v-icon>
-                  </v-btn>
-                </template>
-
-                <v-list density="compact">
-                  <v-list-item @click.stop="goToDetail(item)">
-                    <template #prepend><v-icon>info</v-icon></template>
-                    <v-list-item-title>詳情</v-list-item-title>
-                  </v-list-item>
-
-                  <v-list-item @click.stop="restore(item)">
-                    <template #prepend><v-icon>block</v-icon></template>
-                    <v-list-item-title>停用</v-list-item-title>
-                  </v-list-item>
-
-                  <v-list-item @click.stop="confirmDelete(item)">
-                    <template #prepend><v-icon color="error">delete</v-icon></template>
-                    <v-list-item-title class="text-error">刪除</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+              <div class="d-flex justify-end align-center">
+                <v-btn
+                  color="warning"
+                  variant="text"
+                  size="small"
+                  prepend-icon="block"
+                  :disabled="!item.isActive"
+                  @click.stop="restore(item)"
+                  class="mr-2"
+                >
+                  停用
+                </v-btn>
+                <v-btn
+                  color="error"
+                  variant="text"
+                  size="small"
+                  prepend-icon="delete"
+                  @click.stop="confirmDelete(item)"
+                >
+                  刪除
+                </v-btn>
+              </div>
             </template>
             <template #no-data>
               <div class="text-center pa-6">
@@ -188,7 +181,7 @@ const headers = [
   { title: '信箱', value: 'email' },
   { title: '狀態', value: 'isActive' },
   { title: '更新日期', value: 'updateAt' },
-  { title: '', value: 'actions', sortable: false, align: 'end' },
+  { title: '操作', value: 'actions', sortable: false, align: 'end' },
 ]
 
 const serverItems = ref([])

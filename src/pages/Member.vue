@@ -52,12 +52,10 @@
             :options="options"
             :showCheckBox="true"
             @update:options="onOptionsUpdate"
+            @click:row="(_, { item }) => goToDetail(item.accountGuid)"
+            hover
+            style="cursor: pointer"
           >
-            <template #item.name="{ item }">
-              <v-btn variant="text" color="primary" @click="goToDetail(item.accountGuid)">{{
-                item.name
-              }}</v-btn>
-            </template>
             <!-- 操作按鈕 -->
             <template #item.actions="{ item }">
               <v-menu>
@@ -141,7 +139,7 @@ watch(selectedStatus, async (val) => {
 // 分頁 + 排序狀態
 const options = ref({
   page: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 50,
   sortBy: [],
   search: '',
 })

@@ -52,43 +52,21 @@
                 :items="serverItems"
                 :search="search"
                 item-key="id"
+                @click:row="(_, { item }) => openEdit(item.id)"
                 hover
                 class="elevation-0"
+                style="cursor: pointer"
               >
-                <template #item.name="{ item }">
-                  <v-btn color="primary" variant="text" :to="{ name: '' }">{{ item.name }}</v-btn>
-                </template>
                 <template #item.actions="{ item }">
-                  <v-menu location="bottom end" offset="8">
-                    <template #activator="{ props }">
-                      <v-btn
-                        v-bind="props"
-                        size="small"
-                        variant="text"
-                        icon
-                        @click.stop
-                        aria-label="更多操作"
-                      >
-                        <v-icon>more_horiz</v-icon>
-                      </v-btn>
-                    </template>
-
-                    <v-list density="compact">
-                      <v-list-item @click.stop="openEdit(item.id)">
-                        <template #prepend>
-                          <v-icon>edit</v-icon>
-                        </template>
-                        <v-list-item-title>編輯</v-list-item-title>
-                      </v-list-item>
-
-                      <v-list-item @click.stop="confirmDelete(item.id)">
-                        <template #prepend>
-                          <v-icon color="error">delete</v-icon>
-                        </template>
-                        <v-list-item-title class="text-error"> 刪除 </v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
+                  <v-btn
+                    color="error"
+                    variant="text"
+                    size="small"
+                    prepend-icon="delete"
+                    @click.stop="confirmDelete(item.id)"
+                  >
+                    刪除
+                  </v-btn>
                 </template>
                 <template #no-data>
                   <div class="text-center pa-6">

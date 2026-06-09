@@ -31,13 +31,10 @@
               :items-length="totalCount"
               :options="options"
               @update:options="onOptionsUpdate"
+              @click:row="(_, { item }) => openDetail(item.id)"
               hover
+              style="cursor: pointer"
             >
-              <template #item.contractProfiles[0].realName="{ item }">
-                <v-btn variant="text" color="primary" @click="openDetail(item.id)">{{
-                  item.contractProfiles[0].realName
-                }}</v-btn>
-              </template>
               <template #item.contractProfiles[0].isDataConfirmed="{ item }">
                 <v-chip
                   :color="item.contractProfiles[0]?.isDataConfirmed ? 'green' : 'red'"
@@ -549,7 +546,7 @@ watch(selectedStatus, (val) => {
 // 分頁 + 排序狀態
 const options = ref({
   page: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 50,
   sortBy: [],
   search: '',
 })

@@ -44,7 +44,7 @@ defineExpose({
 const dialog = useDialogStore()
 
 const rawData = ref([])
-const itemsPerPage = ref(-1)
+const itemsPerPage = ref(50)
 
 const headers = ref([
   { title: '姓名', key: 'name' },
