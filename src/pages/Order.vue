@@ -72,6 +72,7 @@
         item-value="name"
         @update:options="loadItems"
         @click:row="(_, { item }) => goToDetail(item.salesOrderId)"
+        :row-props="getOrderRowProps"
         hover
         style="cursor: pointer"
       >
@@ -106,12 +107,24 @@
         </template>
       </v-data-table-server>
     </v-card>
+
+    <div
+      v-if="rowMenu.open"
+      class="row-link-menu"
+      :style="{ left: `${rowMenu.x}px`, top: `${rowMenu.y}px` }"
+      @click.stop
+      @contextmenu.prevent
+    >
+      <button type="button" @click="openMenuLink('_blank')">在新分頁開啟</button>
+      <button type="button" @click="openMenuLink('_self')">在目前分頁開啟</button>
+      <button type="button" @click="copyMenuLink">複製連結</button>
+    </div>
   </v-container>
 </template>
 
 <script setup>
 import api from '@/plugins/api'
-import { reactive, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import router from '@/router'
 import { useDialogStore } from '@/stores/dialog'
@@ -255,6 +268,12 @@ const search = ref('')
 const serverItems = ref([])
 const loading = ref(false)
 const totalItems = ref(0)
+const rowMenu = reactive({
+  open: false,
+  x: 0,
+  y: 0,
+  href: '',
+})
 
 const options = ref({
   page: 1,
@@ -284,13 +303,63 @@ watch(isValid, (newVal) => {
 function onTabChange() {}
 
 /* -------- 跳轉詳情頁 -------- */
-function goToDetail(id) {
+function getOrderDetailHref(id) {
   const routeData = router.resolve({
     name: 'OrderDetail',
     params: { id },
   })
 
-  window.open(routeData.href, '_blank')
+  return routeData.href
+}
+
+function goToDetail(id) {
+  window.open(getOrderDetailHref(id), '_blank')
+}
+
+function getOrderRowProps({ item }) {
+  return {
+    onContextmenu: (event) => openRowMenu(event, item.salesOrderId),
+    onAuxclick: (event) => {
+      if (event.button === 1) {
+        event.preventDefault()
+        window.open(getOrderDetailHref(item.salesOrderId), '_blank')
+      }
+    },
+  }
+}
+
+function openRowMenu(event, id) {
+  event.preventDefault()
+  rowMenu.href = getOrderDetailHref(id)
+  rowMenu.x = Math.min(event.clientX, window.innerWidth - 190)
+  rowMenu.y = Math.min(event.clientY, window.innerHeight - 130)
+  rowMenu.open = true
+}
+
+function closeRowMenu() {
+  rowMenu.open = false
+}
+
+function openMenuLink(target) {
+  if (!rowMenu.href) return
+  if (target === '_self') {
+    window.location.href = rowMenu.href
+  } else {
+    window.open(rowMenu.href, '_blank')
+  }
+  closeRowMenu()
+}
+
+async function copyMenuLink() {
+  const url = new URL(rowMenu.href, window.location.origin).href
+  try {
+    await navigator.clipboard.writeText(url)
+    dialog.showSuccess('已複製連結', url)
+  } catch {
+    dialog.showError('複製失敗', '瀏覽器不允許複製連結，請改用開啟新分頁。')
+  } finally {
+    closeRowMenu()
+  }
 }
 
 function goToMemberDetail(guid) {
@@ -321,11 +390,53 @@ async function onToggleEndCase(id, nextValue) {
     dialog.hideLoading()
   }
 }
+
+function onGlobalKeydown(event) {
+  if (event.key === 'Escape') closeRowMenu()
+}
+
+onMounted(() => {
+  window.addEventListener('click', closeRowMenu)
+  window.addEventListener('scroll', closeRowMenu, true)
+  window.addEventListener('keydown', onGlobalKeydown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('click', closeRowMenu)
+  window.removeEventListener('scroll', closeRowMenu, true)
+  window.removeEventListener('keydown', onGlobalKeydown)
+})
 </script>
 
 <style scoped>
 .v-data-table :deep(table thead) {
   background-color: #f5f5f5;
   color: #333;
+}
+
+.row-link-menu {
+  position: fixed;
+  z-index: 2500;
+  width: 180px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.row-link-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: #222;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row-link-menu button:hover {
+  background: #f5f5f5;
 }
 </style>

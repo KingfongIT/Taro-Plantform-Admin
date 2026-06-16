@@ -11,6 +11,7 @@ export const useDialogStore = defineStore('dialog', {
     errorVisible: false,
     errorTitle: '',
     errorMessage: '',
+    errorDetails: null,
     isSuccess: false,
 
     // confirm
@@ -31,21 +32,24 @@ export const useDialogStore = defineStore('dialog', {
     },
 
     // Error & Success Dialog
-    showError(title, message) {
+    showError(title, message, details = null) {
       this.errorTitle = title
-      this.errorMessage = message
+      this.errorMessage = typeof message === 'string' ? message : JSON.stringify(message ?? '')
+      this.errorDetails = details
       this.isSuccess = false
       this.errorVisible = true
     },
     showSuccess(title, message) {
       this.errorTitle = title
-      this.errorMessage = message
+      this.errorMessage = typeof message === 'string' ? message : JSON.stringify(message ?? '')
+      this.errorDetails = null
       this.isSuccess = true
       this.errorVisible = true
     },
     closeError() {
       this.errorTitle = ''
       this.errorMessage = ''
+      this.errorDetails = null
       this.isSuccess = false
       this.errorVisible = false
     },
@@ -60,7 +64,7 @@ export const useDialogStore = defineStore('dialog', {
       }
 
       const title = titleMap[normalized.kind] || defaultTitle
-      this.showError(title, normalized.message)
+      this.showError(title, normalized.message, normalized.details || null)
     },
 
     // ✅ 關鍵：回傳 Promise<boolean>

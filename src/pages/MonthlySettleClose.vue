@@ -478,7 +478,7 @@
                 <template #item.adminFeeRate="{ item }"><span>{{ formatNumber(item.adminFeeRate) }}</span></template>
                 <template #item.adminFeeAmount="{ item }"><span>{{ formatNumber(item.adminFeeAmount) }}</span></template>
                 <template #item.netProductProfit="{ item }"><span>{{ formatNumber(item.netProductProfit) }}</span></template>
-                <template #item.percentage="{ item }"><span>{{ formatNumber(item.percentage) }}%</span></template>
+                <template #item.percentage="{ item }"><span>{{ item.shareDisplay || `${formatNumber(item.percentage)}%` }}</span></template>
                 <template #item.rawAmount="{ item }"><span class="font-weight-medium">{{ formatNumber(item.rawAmount) }}</span></template>
                 <template #item.taxAmount="{ item }"><span class="text-red-darken-2">-{{ formatNumber(item.taxAmount) }}</span></template>
                 <template #item.premiumAmount="{ item }"><span class="text-orange-darken-2">-{{ formatNumber(item.premiumAmount) }}</span></template>
@@ -1527,7 +1527,7 @@ async function executeClosing() {
     dialog.showSuccess('關帳完成', res.data.message || '關帳發佣程序已成功執行！')
     await fetchData()
   } catch (err) {
-    dialog.showError('關帳失敗', err.response?.data?.message || '執行關帳作業時出錯。')
+    dialog.showAxiosError(err, '關帳失敗')
   } finally {
     actionLoading.value = false
   }

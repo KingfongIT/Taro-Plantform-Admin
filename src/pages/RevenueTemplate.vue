@@ -167,7 +167,7 @@
                 <v-text-field
                   v-model="schema.partnerShareValue"
                   density="comfortable"
-                  :suffix="'%'"
+                  :suffix="String(schema.partnerShareType || '').trim().toUpperCase() === 'FIXED' ? 'NT$' : '%'"
                   placeholder="0"
                   :rules="[
                     (v) => !schema.isPartner || rules.required(v),

@@ -169,11 +169,7 @@
                                 <tr>
                                   <td>乙方</td>
                                   <td>
-                                    {{
-                                      revenueSchemeDetail?.partnerShareValue
-                                        ? revenueSchemeDetail?.partnerShareValue + '%'
-                                        : '-'
-                                    }}
+                                    {{ formatShareValue(revenueSchemeDetail?.partnerShareValue, revenueSchemeDetail?.partnerShareType) }}
                                   </td>
                                   <td>-</td>
                                 </tr>
@@ -936,11 +932,7 @@
                             <tr>
                               <td>乙方</td>
                               <td>
-                                {{
-                                  tempRevenueTemplate?.partnerShareValue
-                                    ? tempRevenueTemplate?.partnerShareValue + '%'
-                                    : '-'
-                                }}
+                                {{ formatShareValue(tempRevenueTemplate?.partnerShareValue, tempRevenueTemplate?.partnerShareType) }}
                               </td>
                               <td>-</td>
                             </tr>
@@ -1672,6 +1664,11 @@ const schemeNameMap = computed(() => {
 function schemeNameById(id) {
   if (id == null) return ''
   return schemeNameMap.value.get(id) ?? ''
+}
+
+function formatShareValue(value, type) {
+  if (value == null || value === '') return '-'
+  return String(type || '').trim().toUpperCase() === 'FIXED' ? `NT$ ${value}` : `${value}%`
 }
 
 //抓分潤模板
