@@ -194,7 +194,9 @@
                   color="teal"
                   hide-details
                   density="compact"
-                  @update:model-value="toggleSingleAgent(item, 'IsUnionInsured', item.isUnionInsured)"
+                  @update:model-value="
+                    toggleSingleAgent(item, 'IsUnionInsured', item.isUnionInsured)
+                  "
                 >
                   <template #label>
                     <v-chip
@@ -324,7 +326,9 @@
                   color="teal"
                   hide-details
                   density="compact"
-                  @update:model-value="toggleSingleExternal(item, 'IsUnionInsured', item.isUnionInsured)"
+                  @update:model-value="
+                    toggleSingleExternal(item, 'IsUnionInsured', item.isUnionInsured)
+                  "
                 >
                   <template #label>
                     <v-chip
@@ -355,7 +359,7 @@ const dialog = useDialogStore()
 // System setting fields
 const systemSettings = ref({
   taxRate: '5',
-  basicSalaryThreshold: '29500'
+  basicSalaryThreshold: '29500',
 })
 const saveSettingsLoading = ref(false)
 
@@ -375,7 +379,12 @@ const agentHeaders = [
   { title: '代理商位階', key: 'gradeName', sortable: true },
   { title: 'Email', key: 'email', sortable: true },
   { title: '是否為法人帳戶 (不扣二代健保)', key: 'isCorporate', width: '220px', sortable: false },
-  { title: '是否已投保職業工會 (不扣二代健保)', key: 'isUnionInsured', width: '220px', sortable: false }
+  {
+    title: '是否已投保職業工會 (不扣二代健保)',
+    key: 'isUnionInsured',
+    width: '220px',
+    sortable: false,
+  },
 ]
 
 // External members (乙方) state
@@ -391,7 +400,12 @@ const externalHeaders = [
   { title: '電話', key: 'phone', sortable: true },
   { title: '銀行帳號', key: 'bankAccount', sortable: false },
   { title: '是否為法人帳戶 (不扣二代健保)', key: 'isCorporate', width: '220px', sortable: false },
-  { title: '是否已投保職業工會 (不扣二代健保)', key: 'isUnionInsured', width: '220px', sortable: false }
+  {
+    title: '是否已投保職業工會 (不扣二代健保)',
+    key: 'isUnionInsured',
+    width: '220px',
+    sortable: false,
+  },
 ]
 
 // Filter computed properties
@@ -403,7 +417,7 @@ const filteredAgents = computed(() => {
       (a.name && a.name.toLowerCase().includes(q)) ||
       (a.email && a.email.toLowerCase().includes(q)) ||
       (a.unitName && a.unitName.toLowerCase().includes(q)) ||
-      (a.gradeName && a.gradeName.toLowerCase().includes(q))
+      (a.gradeName && a.gradeName.toLowerCase().includes(q)),
   )
 })
 
@@ -414,7 +428,7 @@ const filteredExternal = computed(() => {
     (e) =>
       (e.name && e.name.toLowerCase().includes(q)) ||
       (e.email && e.email.toLowerCase().includes(q)) ||
-      (e.phone && e.phone.toLowerCase().includes(q))
+      (e.phone && e.phone.toLowerCase().includes(q)),
   )
 })
 
@@ -487,7 +501,7 @@ async function saveSystemSettings() {
   try {
     await api.post('/Commission/system-settings', {
       taxRate: systemSettings.value.taxRate,
-      basicSalaryThreshold: systemSettings.value.basicSalaryThreshold
+      basicSalaryThreshold: systemSettings.value.basicSalaryThreshold,
     })
     dialog.showSuccess('儲存成功', '系統參數已順利更新。')
   } catch (err) {
@@ -504,7 +518,7 @@ async function toggleSingleAgent(item, field, val) {
     await api.post('/Commission/batch-update-agent-settings', {
       accountGuids: [item.accountGuid],
       [field.charAt(0).toLowerCase() + field.slice(1)]: val,
-      field: field
+      field: field,
     })
   } catch (err) {
     console.error('Failed to update agent:', err)
@@ -522,9 +536,12 @@ async function batchUpdateAgents(field, val) {
     await api.post('/Commission/batch-update-agent-settings', {
       accountGuids: selectedAgents.value,
       [field.charAt(0).toLowerCase() + field.slice(1)]: val,
-      field: field
+      field: field,
     })
-    dialog.showSuccess('批次設定成功', `已成功將所選的 ${selectedAgents.value.length} 位代理商進行更新。`)
+    dialog.showSuccess(
+      '批次設定成功',
+      `已成功將所選的 ${selectedAgents.value.length} 位代理商進行更新。`,
+    )
     await fetchAgents()
   } catch (err) {
     console.error('Batch update agents failed:', err)
@@ -540,7 +557,7 @@ async function toggleSingleExternal(item, field, val) {
     await api.post('/Commission/batch-update-external-member-settings', {
       ids: [item.id],
       [field.charAt(0).toLowerCase() + field.slice(1)]: val,
-      field: field
+      field: field,
     })
   } catch (err) {
     console.error('Failed to update external member:', err)
@@ -558,9 +575,12 @@ async function batchUpdateExternal(field, val) {
     await api.post('/Commission/batch-update-external-member-settings', {
       ids: selectedExternal.value,
       [field.charAt(0).toLowerCase() + field.slice(1)]: val,
-      field: field
+      field: field,
     })
-    dialog.showSuccess('批次設定成功', `已成功將所選的 ${selectedExternal.value.length} 位外部會員進行更新。`)
+    dialog.showSuccess(
+      '批次設定成功',
+      `已成功將所選的 ${selectedExternal.value.length} 位外部會員進行更新。`,
+    )
     await fetchExternal()
   } catch (err) {
     console.error('Batch update external members failed:', err)

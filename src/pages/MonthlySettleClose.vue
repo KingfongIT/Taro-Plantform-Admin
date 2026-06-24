@@ -480,8 +480,6 @@
                 <template #item.netProductProfit="{ item }"><span>{{ formatNumber(item.netProductProfit) }}</span></template>
                 <template #item.percentage="{ item }"><span>{{ item.shareDisplay || `${formatNumber(item.percentage)}%` }}</span></template>
                 <template #item.rawAmount="{ item }"><span class="font-weight-medium">{{ formatNumber(item.rawAmount) }}</span></template>
-                <template #item.taxAmount="{ item }"><span class="text-red-darken-2">-{{ formatNumber(item.taxAmount) }}</span></template>
-                <template #item.premiumAmount="{ item }"><span class="text-orange-darken-2">-{{ formatNumber(item.premiumAmount) }}</span></template>
                 <template #item.amount="{ item }"><span class="font-weight-bold text-success">{{ formatNumber(item.amount) }}</span></template>
                 <template #item.payoutStatus="{ item }">
                   <v-chip size="small" :color="statusColor(item.payoutStatus)" variant="flat">{{ statusLabel(item.payoutStatus) }}</v-chip>
@@ -1226,8 +1224,6 @@ const feeDetailPartnerHeaders = computed(() => [
   { title: '商品淨利', key: 'netProductProfit', align: 'end' },
   { title: '分潤比 (%)', key: 'percentage', align: 'end' },
   { title: '應發總額', key: 'rawAmount', align: 'end' },
-  { title: `所得稅 (${taxRatePercent.value}%)`, key: 'taxAmount', align: 'end' },
-  { title: '補充保費 (2.11%)', key: 'premiumAmount', align: 'end' },
   { title: '實發金額', key: 'amount', align: 'end' },
   { title: '發放狀態', key: 'payoutStatus', width: 130 },
   { title: '操作', key: 'actions', sortable: false, width: 200 }

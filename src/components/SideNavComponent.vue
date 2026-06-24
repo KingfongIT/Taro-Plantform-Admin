@@ -56,7 +56,6 @@ import { useReviewStore } from '@/stores/review'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
-
 const isDev = import.meta.env.DEV
 const router = useRouter()
 const auth = useAuthStore()
@@ -280,6 +279,11 @@ const navbar = ref([
         path: { name: 'MonthlySettleClose' },
       },
       {
+        title: '手動加扣款',
+        value: 'ManualTokenAdjust',
+        path: { name: 'ManualTokenAdjust' },
+      },
+      {
         title: '所得稅與二代健保設定',
         value: 'TaxSystemSettings',
         path: { name: 'TaxSystemSettings' },
@@ -289,16 +293,16 @@ const navbar = ref([
         value: 'ManagementFeeSettings',
         path: { name: 'ManagementFeeSettings' },
       },
-      {
-        title: '案件結算作業',
-        value: 'CommissionSettlement',
-        path: { name: 'CommissionSettlement' },
-      },
-      {
-        title: '小芋頭雞肉飼料發佣 ',
-        value: 'TokenSettlement',
-        path: { name: 'TokenSettlement' },
-      },
+      //   {
+      //     title: '案件結算作業',
+      //     value: 'CommissionSettlement',
+      //     path: { name: 'CommissionSettlement' },
+      //   },
+      //   {
+      //     title: '小芋頭雞肉飼料發佣 ',
+      //     value: 'TokenSettlement',
+      //     path: { name: 'TokenSettlement' },
+      //   },
       // {
       //   title: '非小芋頭雞肉飼料發佣',
       //   value: 'NotTokenSettlement',
@@ -449,8 +453,6 @@ onMounted(async () => {
     font-size: 20px;
     margin-left: 5px;
   }
-
-
 
   .v-list-item:hover {
     color: rgb(var(--v-theme-primary));

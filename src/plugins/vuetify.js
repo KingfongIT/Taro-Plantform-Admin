@@ -67,11 +67,11 @@ const vuetify = createVuetify({
   defaults: {
     VDataTable: {
       itemsPerPage: 50,
-      itemsPerPageOptions: [50, 100, { value: -1, title: 'ALL' }],
+      itemsPerPageOptions: [50, 100, 200, 500, { value: -1, title: 'ALL' }],
     },
     VDataTableServer: {
       itemsPerPage: 50,
-      itemsPerPageOptions: [50, 100, { value: -1, title: 'ALL' }],
+      itemsPerPageOptions: [50, 100, 200, 500, { value: -1, title: 'ALL' }],
     },
   },
 })

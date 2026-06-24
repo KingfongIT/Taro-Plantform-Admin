@@ -153,7 +153,7 @@ const tableLoading = ref(false)
 const totalCount = ref(0)
 const options = ref({
   page: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 50,
   sortBy: [],
   sortDesc: [],
 })

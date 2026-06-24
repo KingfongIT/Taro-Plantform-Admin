@@ -36,6 +36,7 @@ import AgentPayment from '@/pages/AgentPayment.vue'
 import TokenSettlement from '@/pages/TokenSettlement.vue'
 import CommissionSettlement from '@/pages/CommissionSettlement.vue'
 import MonthlySettleClose from '@/pages/MonthlySettleClose.vue'
+import ManualTokenAdjust from '@/pages/ManualTokenAdjust.vue'
 import TaxSystemSettings from '@/pages/TaxSystemSettings.vue'
 import ManagementFeeSettings from '@/pages/ManagementFeeSettings.vue'
 import { components } from 'vuetify/dist/vuetify.js'
@@ -332,6 +333,16 @@ const routes = [
             },
           },
           {
+            path: 'manualTokenAdjust',
+            name: 'ManualTokenAdjust',
+            component: ManualTokenAdjust,
+            meta: {
+              title: '手動加扣款',
+              requiresAuth: true,
+              permission: 'PRODUCT_CASESETTLEMENT_VIEW',
+            },
+          },
+          {
             path: 'taxSystemSettings',
             name: 'TaxSystemSettings',
             component: TaxSystemSettings,
@@ -494,7 +505,7 @@ router.beforeEach(async (to, from, next) => {
     const newToken = await authStore.refreshToken()
     if (!newToken) {
       authStore.clearToken()
-      return next({ name: 'Login' })
+      return next({ name: 'Login', query: { redirect: to.fullPath } })
     }
   }
 
@@ -506,7 +517,7 @@ router.beforeEach(async (to, from, next) => {
       // 拿不到 permissions 時：通常是 token 有問題或後端掛了
       dialog.showError('驗證錯誤', '無法取得權限資料，請重新登入')
       authStore.clearToken()
-      return next({ name: 'Login' })
+      return next({ name: 'Login', query: { redirect: to.fullPath } })
     }
   }
 

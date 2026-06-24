@@ -610,7 +610,14 @@
                                 <!-- 左：規格資訊 -->
                                 <v-col cols="6" class="d-flex flex-column ga-2">
                                   <div class="d-flex align-center justify-space-between mb-1">
-                                    <div class="text-overline">Variant</div>
+                                    <div class="d-flex flex-column">
+                                      <span class="text-caption font-weight-medium">
+                                        規格ID：{{ v.variantId ?? '—' }}
+                                      </span>
+                                      <span class="text-caption text-medium-emphasis">
+                                        SKU：{{ v.sku || '—' }}
+                                      </span>
+                                    </div>
                                     <v-chip
                                       :color="v.isActive ? 'success' : 'grey'"
                                       size="small"
@@ -1885,6 +1892,14 @@ onMounted(async () => {
     if (id) {
       isEdit.value = true
       await fetchProduct(route.params.id)
+
+      // 從訂單詳情「目前商品資料」帶 variantId 進來時，自動開啟該規格抽屜
+      const targetVariantId = route.query.variantId ? Number(route.query.variantId) : null
+      if (targetVariantId) {
+        await nextTick()
+        const targetVariant = variants.value.find((v) => v.variantId === targetVariantId)
+        if (targetVariant) openVariant(targetVariant)
+      }
     } else {
       isEdit.value = false
       // 新增模式：建立初始變體

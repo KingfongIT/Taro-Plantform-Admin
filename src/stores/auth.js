@@ -10,6 +10,13 @@ import { computed } from 'vue'
 const baseURL = import.meta.env.VITE_API_URL
 const isDev = import.meta.env.DEV
 
+function getSafeRedirectPath(value) {
+  if (typeof value !== 'string') return null
+  if (!value.startsWith('/') || value.startsWith('//')) return null
+  if (value.startsWith('/login')) return null
+  return value
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null,
@@ -95,7 +102,12 @@ export const useAuthStore = defineStore('auth', {
           }
           this.setToken(token)
           await this.fetchMyPermissions()
-          router.push({ name: 'home' })
+          const redirectPath = getSafeRedirectPath(router.currentRoute.value.query.redirect)
+          if (redirectPath) {
+            router.replace(redirectPath)
+          } else {
+            router.replace({ name: 'home' })
+          }
           return
         }
 
