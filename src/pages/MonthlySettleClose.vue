@@ -87,16 +87,16 @@
             ></v-btn>
           </div>
           <v-btn
-            v-if="isDev && status.isSettled"
+            v-if="status.isSettled"
             color="error"
             variant="tonal"
             size="small"
             class="mt-3 w-100"
             prepend-icon="delete_sweep"
             :loading="resetLoading"
-            @click="triggerTestResetMonth"
+            @click="triggerResetMonth"
           >
-            測試重設此月份狀態
+            重置並重算此月份
           </v-btn>
         </v-card>
       </v-col>
@@ -1090,8 +1090,6 @@ const chartOptions = computed(() => {
 
 // 詳情分頁與開發環境判斷
 const detailsTab = ref('settlement')
-const env_mod = import.meta.env.MODE
-const isDev = env_mod === 'development' || env_mod === 'staging'
 const resetLoading = ref(false)
 
 // 自訂月份選擇器狀態
@@ -1423,23 +1421,33 @@ async function triggerManualSettle() {
   }
 }
 
-// 測試重設月份結算與關帳狀態
-async function triggerTestResetMonth() {
-  const confirm = await dialog.askConfirm({
-    title: '⚠️ 測試重設警告',
-    message: `確認要【重設】 ${yearMonth.value} 月份的所有結算與關帳資料嗎？\n系統將自動還原所有對應的餘額與扣除紀錄，此操作僅供測試環境使用。`
+// 重置並重算月份（清除佣金結算結果，供重算用；保留 admin 手動加扣款紀錄）
+// 正式環境亦可使用，因此採「雙重確認」避免誤點。
+async function triggerResetMonth() {
+  // 第一層確認：說明用途
+  const first = await dialog.askConfirm({
+    title: '重置並重算此月份',
+    message: `即將清除 ${yearMonth.value} 月份的「佣金結算結果」（結算明細、彙總、關帳狀態與其發放的飼料餘額），以便用修正後的算法重新結算。\n\n會保留：admin 手動加扣款紀錄不受影響。\n\n要繼續嗎？`
   })
-  if (!confirm) return
+  if (!first) return
+
+  // 第二層確認：不可逆紅色警告
+  const second = await dialog.askConfirm({
+    title: '⚠️ 最終確認（不可逆）',
+    message: `這是正式環境的不可逆操作，將實際還原 ${yearMonth.value} 月份已發放的飼料並刪除該月結算紀錄。\n請確認已下載/核對過原始報表後再執行。\n\n確定要重置 ${yearMonth.value} 嗎？`,
+    isDelete: true
+  })
+  if (!second) return
 
   resetLoading.value = true
   try {
     const res = await api.post('/Commission/test-reset-month', {
       YearMonth: yearMonth.value
     })
-    dialog.showSuccess('重設成功', res.data.message || '該月份狀態已回復至初始狀態。')
+    dialog.showSuccess('重置成功', res.data.message || `${yearMonth.value} 已回復至未結算狀態，可重新執行結算。`)
     await fetchData()
   } catch (err) {
-    dialog.showError('重設失敗', err.response?.data?.message || '執行重設時出錯。')
+    dialog.showError('重置失敗', err.response?.data?.message || '執行重置時出錯。')
   } finally {
     resetLoading.value = false
   }
